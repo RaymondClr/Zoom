@@ -4,7 +4,7 @@
     Tree.context = global;
 
     var SCRIPT_NAME = 'Zoom',
-        SCRIPT_VERSION = '2.0.1',
+        SCRIPT_VERSION = '2.0.2',
         SCRIPT_DATE = '2022/6/16',
         SCRIPT_AUTHOR = 'Raymond Yan';
 
@@ -112,7 +112,7 @@
         zoomIn.onClick = createZoom(zoomRatio, calculateZoomInValue);
         zoomOut.onClick = createZoom(zoomRatio, calculateZoomOutValue);
         zoomRatio.onChange = zoomRatio.onChanging = createZoom(zoomRatio, calculateZoomRatioValue);
-        isWindowsSystem() && addRightClickEvent(zoomRatio, fitUpView);
+        isWindowsSystem() && addRightClickEvent(elements, fitUpView);
     }
 
     function runWScript(file) {
