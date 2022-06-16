@@ -4,13 +4,11 @@
     Tree.context = global;
 
     var SCRIPT_NAME = 'Zoom',
-        SCRIPT_VERSION = '2.0.3',
+        SCRIPT_VERSION = '2.0.4',
         SCRIPT_DATE = '2022/6/16',
         SCRIPT_AUTHOR = 'Raymond Yan';
 
     var STEP_DEFAULT = 5;
-
-    var RIGHT_CLICK_FLAG = 2;
 
     var SCRIPT_PATH_DEFAULT = createPath('~', 'AppData', 'Roaming', 'Aescripts', SCRIPT_NAME),
         WSCRIPT_FILE_NAME = 'FitView.vbs',
@@ -101,7 +99,7 @@
     }
 
     function isRightClick(event) {
-        return event.button === RIGHT_CLICK_FLAG;
+        return event.button === 2;
     }
 
     function isWindowsSystem() {
