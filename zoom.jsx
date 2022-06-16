@@ -4,7 +4,7 @@
     Tree.context = global;
 
     var SCRIPT_NAME = 'Zoom',
-        SCRIPT_VERSION = '2.0.2',
+        SCRIPT_VERSION = '2.0.3',
         SCRIPT_DATE = '2022/6/16',
         SCRIPT_AUTHOR = 'Raymond Yan';
 
@@ -29,7 +29,7 @@
 
     function addRightClickEvent(element, handle) {
         element.addEventListener('click', function (event) {
-            if (isRightClick(event)) handle(element);
+            if (isRightClick(event)) handle();
         });
     }
 
@@ -71,11 +71,11 @@
         return folder.exists ? folder : folder.create();
     }
 
-    function fitUpView(element) {
+    function fitUpView() {
         if (!hasActiveView()) return;
         if (!canWriteFiles()) return initSettingsWindow();
         var WScriptFile = getWScriptFile();
-        WScriptFile && runWScript(WScriptFile) && syncSlider(element);
+        WScriptFile && runWScript(WScriptFile) && syncSlider();
     }
 
     function getViewRatio() {
@@ -128,8 +128,8 @@
         app.executeCommand(parseFloat(app.version) > 16.0 ? 3131 : 2359);
     }
 
-    function syncSlider(element) {
-        element.value = getViewRatio() * 100;
+    function syncSlider() {
+        zoomRatio.value = getViewRatio() * 100;
     }
 
     function writeFile(file, content) {
