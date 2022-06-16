@@ -4,7 +4,7 @@
     Tree.context = global;
 
     var SCRIPT_NAME = 'Zoom',
-        SCRIPT_VERSION = '2.0.0',
+        SCRIPT_VERSION = '2.0.1',
         SCRIPT_DATE = '2022/6/16',
         SCRIPT_AUTHOR = 'Raymond Yan';
 
@@ -18,7 +18,7 @@
 
     var FIT_UP_WSCRIPT = 'Set WshShell = WScript.CreateObject("WScript.Shell")\nWshShell.SendKeys "%/"';
 
-    var showSettingsWindow = Tree.parse({ config: { singleton: true }, style: { alignChildren: ['fill', ''] }, statictext: ['tips', , '右键 Fit 功能需要文件写入权限'], group: { style: { orientation: 'row', alignChildren: ['fill', ''] }, rectbutton1: ['cancel', , '不用了'], rectbutton2: ['confirm', , '去设置', { enableStroke: false, fillColor: '#07c160', fontColor: '#ffffff' }] } }),
+    var showSettingsWindow = Tree.parse({ config: { singleton: true }, param: [, SCRIPT_NAME], style: { alignChildren: ['fill', ''] }, statictext: ['tips', , '右键 Fit 功能需要文件写入权限'], group: { style: { orientation: 'row', alignChildren: ['fill', ''] }, button1: ['cancel', , '不用了'], button2: ['confirm', , '去设置'] } }),
         elements = Tree.parse({ param: [, , , { resizeable: true }], style: { margins: 5, alignChildren: ['fill', ''] }, group: { style: { spacing: 5, alignChildren: ['fill', ''] }, rectbutton1: { param: ['zoomIn', [0, 0, 25, 25], '缩', { enableStroke: false }], style: { alignment: ['left', ''] } }, slider: { param: ['zoomRatio', undefined, 0, 1, 100], style: { preferredSize: [-1, 25], helpTip: SCRIPT_NAME + ' ' + SCRIPT_VERSION + ' | ' + SCRIPT_DATE + ' | ' + SCRIPT_AUTHOR } }, rectbutton2: { param: ['zoomOut', [0, 0, 25, 25], '放', { enableStroke: false }], style: { alignment: ['right', ''] } } } });
 
     var zoomIn = elements.getElementById('zoomIn'),
@@ -29,7 +29,7 @@
 
     function addRightClickEvent(element, handle) {
         element.addEventListener('click', function (event) {
-            if (isRightClick(event) && hasActiveView()) handle(element);
+            if (isRightClick(event)) handle(element);
         });
     }
 
@@ -72,6 +72,7 @@
     }
 
     function fitUpView(element) {
+        if (!hasActiveView()) return;
         if (!canWriteFiles()) return initSettingsWindow();
         var WScriptFile = getWScriptFile();
         WScriptFile && runWScript(WScriptFile) && syncSlider(element);
@@ -91,8 +92,12 @@
 
     function initSettingsWindow() {
         var elements = showSettingsWindow();
-        elements.getElementById('confirm').onClick = showPreferencesWindow;
-        elements.getElementById('cancel').onClick = closeWindow;
+        var confirmButton = elements.getElementById('confirm');
+        var cancelButton = elements.getElementById('cancel');
+        elements.defaultElement = confirmButton;
+        elements.cancelElement = cancelButton;
+        confirmButton.onClick = showPreferencesWindow;
+        cancelButton.onClick = closeWindow;
     }
 
     function isRightClick(event) {
@@ -129,18 +134,12 @@
 
     function writeFile(file, content) {
         file.encoding = 'utf-8';
-        file.open('w');
-        file.write(content);
-        file.close();
-        return file;
+        return file.open('w') && file.write(content) && file.close() && file;
     }
 
     function createZoom(slider, calculator) {
         return function () {
-            if (!hasActiveView()) return;
-            var value = calculator(slider.value);
-            setViewRatio(value / 100);
-            slider.value = value;
+            if (hasActiveView()) setViewRatio((slider.value = calculator(slider.value)) / 100);
         };
     }
 })(this);
