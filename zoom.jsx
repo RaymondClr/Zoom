@@ -4,24 +4,23 @@
     Tree.context = global;
 
     var SCRIPT_NAME = 'Zoom',
-        SCRIPT_VERSION = '2.0.5',
+        SCRIPT_VERSION = '2.0.6',
         SCRIPT_DATE = '2022/6/16',
         SCRIPT_AUTHOR = 'Raymond Yan';
 
     var STEP_DEFAULT = 5;
 
     var SCRIPT_PATH_DEFAULT = createPath('~', 'AppData', 'Roaming', 'Aescripts', SCRIPT_NAME),
-        WSCRIPT_FILE_NAME = 'FitView.vbs',
-        WSCRIPT_FILE_PATH = createPath(SCRIPT_PATH_DEFAULT, WSCRIPT_FILE_NAME);
+        WSCRIPT_FILE_PATH = createPath(SCRIPT_PATH_DEFAULT, 'FitView.vbs');
 
     var FIT_UP_WSCRIPT = 'Set WshShell = WScript.CreateObject("WScript.Shell")\nWshShell.SendKeys "%/"';
 
     var showSettingsWindow = Tree.parse({ config: { singleton: true }, param: [, SCRIPT_NAME], style: { alignChildren: ['fill', ''] }, statictext: ['tips', , '右键 Fit 功能需要文件写入权限'], group: { style: { orientation: 'row', alignChildren: ['fill', ''] }, button1: ['cancel', , '不用了'], button2: ['confirm', , '去设置'] } }),
         elements = Tree.parse({ param: [, , , { resizeable: true }], style: { margins: 5, alignChildren: ['fill', ''] }, group: { style: { spacing: 5, alignChildren: ['fill', ''] }, rectbutton1: { param: ['zoomIn', [0, 0, 25, 25], '缩', { enableStroke: false }], style: { alignment: ['left', ''] } }, slider: { param: ['zoomRatio', undefined, 0, 1, 100], style: { preferredSize: [-1, 25], helpTip: SCRIPT_NAME + ' ' + SCRIPT_VERSION + ' | ' + SCRIPT_DATE + ' | ' + SCRIPT_AUTHOR } }, rectbutton2: { param: ['zoomOut', [0, 0, 25, 25], '放', { enableStroke: false }], style: { alignment: ['right', ''] } } } });
 
-    var zoomIn = elements.getElementById('zoomIn'),
-        zoomRatio = elements.getElementById('zoomRatio'),
-        zoomOut = elements.getElementById('zoomOut');
+    var zoomInButton = elements.getElementById('zoomIn'),
+        zoomRatioSlider = elements.getElementById('zoomRatio'),
+        zoomOutButton = elements.getElementById('zoomOut');
 
     runScript();
 
@@ -45,7 +44,7 @@
         return Math.floor(value * 100) / 100;
     }
 
-    function canWriteFiles() {
+    function canWriteFile() {
         var mainSectionName = parseFloat(app.version) > 12.0 ? 'Main Pref Section v2' : 'Main Pref Section';
         var securitySetting = app.preferences.getPrefAsLong(mainSectionName, 'Pref_SCRIPTING_FILE_NETWORK_SECURITY');
         return securitySetting === 1;
@@ -71,13 +70,13 @@
 
     function createZoom(calculator) {
         return function () {
-            if (hasActiveView()) setViewRatio((zoomRatio.value = calculator(zoomRatio.value)) / 100);
+            if (hasActiveView()) setViewRatio((zoomRatioSlider.value = calculator(zoomRatioSlider.value)) / 100);
         };
     }
 
     function fitUpView() {
         if (!hasActiveView()) return;
-        if (!canWriteFiles()) return initSettingsWindow();
+        if (!canWriteFile()) return initSettingsWindow();
         var WScriptFile = getWScriptFile();
         WScriptFile && runWScript(WScriptFile) && syncZoomRatio();
     }
@@ -113,9 +112,9 @@
     }
 
     function runScript() {
-        zoomIn.onClick = createZoom(calculateZoomInValue);
-        zoomOut.onClick = createZoom(calculateZoomOutValue);
-        zoomRatio.onChange = zoomRatio.onChanging = createZoom(calculateZoomRatioValue);
+        zoomInButton.onClick = createZoom(calculateZoomInValue);
+        zoomOutButton.onClick = createZoom(calculateZoomOutValue);
+        zoomRatioSlider.onChange = zoomRatioSlider.onChanging = createZoom(calculateZoomRatioValue);
         isWindowsSystem() && addRightClickEvent(elements, fitUpView);
     }
 
@@ -133,7 +132,7 @@
     }
 
     function syncZoomRatio() {
-        zoomRatio.value = getViewRatio() * 100;
+        zoomRatioSlider.value = getViewRatio() * 100;
     }
 
     function writeFile(file, content) {
