@@ -4,14 +4,14 @@
     Tree.context = global;
 
     var SCRIPT_NAME = 'Zoom',
-        SCRIPT_VERSION = '2.0.6',
-        SCRIPT_DATE = '2022/6/16',
+        SCRIPT_VERSION = '2.0.7',
+        SCRIPT_DATE = '2022/6/17',
         SCRIPT_AUTHOR = 'Raymond Yan';
 
     var STEP_DEFAULT = 5;
 
-    var SCRIPT_PATH_DEFAULT = createPath('~', 'AppData', 'Roaming', 'Aescripts', SCRIPT_NAME),
-        WSCRIPT_FILE_PATH = createPath(SCRIPT_PATH_DEFAULT, 'FitView.vbs');
+    var WSCRIPT_PATH_DEFAULT = createPath('~', 'AppData', 'Roaming', 'Aescripts', SCRIPT_NAME),
+        WSCRIPT_FILE_PATH = createPath(WSCRIPT_PATH_DEFAULT, 'FitView.vbs');
 
     var FIT_UP_WSCRIPT = 'Set WshShell = WScript.CreateObject("WScript.Shell")\nWshShell.SendKeys "%/"';
 
@@ -64,7 +64,7 @@
     }
 
     function createWScriptFolder() {
-        var folder = new Folder(SCRIPT_PATH_DEFAULT);
+        var folder = new Folder(WSCRIPT_PATH_DEFAULT);
         return folder.exists ? folder : folder.create();
     }
 
@@ -112,6 +112,7 @@
     }
 
     function runScript() {
+        syncZoomRatio();
         zoomInButton.onClick = createZoom(calculateZoomInValue);
         zoomOutButton.onClick = createZoom(calculateZoomOutValue);
         zoomRatioSlider.onChange = zoomRatioSlider.onChanging = createZoom(calculateZoomRatioValue);
