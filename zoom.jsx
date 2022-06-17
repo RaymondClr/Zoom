@@ -4,7 +4,7 @@
     Tree.context = global;
 
     var SCRIPT_NAME = 'Zoom',
-        SCRIPT_VERSION = '2.0.4',
+        SCRIPT_VERSION = '2.0.5',
         SCRIPT_DATE = '2022/6/16',
         SCRIPT_AUTHOR = 'Raymond Yan';
 
@@ -59,21 +59,27 @@
         return [].join.call(arguments, '/');
     }
 
-    function creatWScriptFile() {
+    function createWScriptFile() {
         var file = new File(WSCRIPT_FILE_PATH);
         return file.exists ? file : writeFile(file, FIT_UP_WSCRIPT);
     }
 
-    function creatWScriptFolder() {
+    function createWScriptFolder() {
         var folder = new Folder(SCRIPT_PATH_DEFAULT);
         return folder.exists ? folder : folder.create();
+    }
+
+    function createZoom(calculator) {
+        return function () {
+            if (hasActiveView()) setViewRatio((zoomRatio.value = calculator(zoomRatio.value)) / 100);
+        };
     }
 
     function fitUpView() {
         if (!hasActiveView()) return;
         if (!canWriteFiles()) return initSettingsWindow();
         var WScriptFile = getWScriptFile();
-        WScriptFile && runWScript(WScriptFile) && syncSlider();
+        WScriptFile && runWScript(WScriptFile) && syncZoomRatio();
     }
 
     function getViewRatio() {
@@ -81,7 +87,7 @@
     }
 
     function getWScriptFile() {
-        return creatWScriptFolder() && creatWScriptFile();
+        return createWScriptFolder() && createWScriptFile();
     }
 
     function hasActiveView() {
@@ -107,9 +113,9 @@
     }
 
     function runScript() {
-        zoomIn.onClick = createZoom(zoomRatio, calculateZoomInValue);
-        zoomOut.onClick = createZoom(zoomRatio, calculateZoomOutValue);
-        zoomRatio.onChange = zoomRatio.onChanging = createZoom(zoomRatio, calculateZoomRatioValue);
+        zoomIn.onClick = createZoom(calculateZoomInValue);
+        zoomOut.onClick = createZoom(calculateZoomOutValue);
+        zoomRatio.onChange = zoomRatio.onChanging = createZoom(calculateZoomRatioValue);
         isWindowsSystem() && addRightClickEvent(elements, fitUpView);
     }
 
@@ -126,18 +132,12 @@
         app.executeCommand(parseFloat(app.version) > 16.0 ? 3131 : 2359);
     }
 
-    function syncSlider() {
+    function syncZoomRatio() {
         zoomRatio.value = getViewRatio() * 100;
     }
 
     function writeFile(file, content) {
         file.encoding = 'utf-8';
         return file.open('w') && file.write(content) && file.close() && file;
-    }
-
-    function createZoom(slider, calculator) {
-        return function () {
-            if (hasActiveView()) setViewRatio((slider.value = calculator(slider.value)) / 100);
-        };
     }
 })(this);
