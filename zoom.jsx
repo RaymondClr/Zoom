@@ -4,8 +4,8 @@
     Tree.context = global;
 
     var SCRIPT_NAME = 'Zoom',
-        SCRIPT_VERSION = '2.0.8',
-        SCRIPT_DATE = '2022/6/17',
+        SCRIPT_VERSION = '2.0.9',
+        SCRIPT_DATE = '2022/6/18',
         SCRIPT_AUTHOR = 'Raymond Yan';
 
     var STEP_DEFAULT = 5;
@@ -112,7 +112,7 @@
     }
 
     function runScript() {
-        syncZoomRatio();
+        hasActiveView() && syncZoomRatio();
         zoomInButton.onClick = createZoom(calculateZoomInValue);
         zoomOutButton.onClick = createZoom(calculateZoomOutValue);
         zoomRatioSlider.onChange = zoomRatioSlider.onChanging = createZoom(calculateZoomRatioValue);
